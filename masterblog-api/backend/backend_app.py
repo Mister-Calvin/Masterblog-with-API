@@ -15,7 +15,11 @@ def validate_post_data(data):
         return False
     return True
 
-
+def find_post_by_id(post_id):
+    for post in POSTS:
+        if post['id'] == post_id:
+            return post
+    return None
 
 @app.route('/api/posts', methods=['GET', 'POST'])
 def get_posts():
@@ -35,6 +39,20 @@ def get_posts():
         return jsonify(POSTS)
 
 
+@app.route('/api/posts/<int:id>', methods=['DELETE'])
+def delete_post(id):
+    post = find_post_by_id(id)
+
+    if post is None:
+        return jsonify({'error': 'Post not found'}), 404
+
+    POSTS.remove(post)
+
+    return jsonify({"message": f"Post with id {id} has been deleted successfully."}), 200
+
+
+
+
 @app.errorhandler(404)
 def not_found_error(error):
     return jsonify({"error": "Not Found"}), 404
@@ -43,6 +61,8 @@ def not_found_error(error):
 @app.errorhandler(405)
 def method_not_allowed_error(error):
     return jsonify({"error": "Method Not Allowed"}), 405
+
+
 
 
 
