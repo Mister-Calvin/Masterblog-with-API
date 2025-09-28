@@ -67,6 +67,29 @@ def update_post(id):
     return jsonify(post), 200
 
 
+@app.route('/api/posts/search', methods=['GET'])
+def search_posts():
+    title = request.args.get('title')
+    content = request.args.get('content')
+
+    filtered_posts = POSTS
+
+    if title:
+        filtered_posts = [post for post in filtered_posts if title.lower() in post.get('title', '').lower()]
+    if content:
+        filtered_posts = [post for post in filtered_posts if content.lower() in post.get('content', '').lower()]
+
+    return jsonify(filtered_posts), 200
+
+
+
+
+
+
+
+
+
+
 
 @app.errorhandler(404)
 def not_found_error(error):
