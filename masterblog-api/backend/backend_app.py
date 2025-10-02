@@ -28,8 +28,9 @@ def save_data(file_path, data):
     except Exception as e:
         print(f"❌Error saving data to {file_path}: {e}")
 
-
-POSTS = load_data("POSTS.json")
+def get_posts_data():
+    """Returns a list of posts to a JSON file."""
+    return load_data("POSTS.json")
 
 
 def validate_post_data(data):
@@ -49,7 +50,7 @@ def find_post_by_id(post_id):
             post_id (int): The ID of the post to find.
         Returns:
             dict or None: The post if found, otherwise None."""
-    for post in POSTS:
+    for post in get_posts_data():
         if post['id'] == post_id:
             return post
     return None
@@ -68,10 +69,11 @@ def get_posts():
             return jsonify({'error': 'Invalid post data'}), 400
 
         #gerenrate new id
-        new_id = max(post["id"] for post in POSTS) + 1
+        new_id = max(post["id"] for post in get_posts_data()) + 1
         new_post["id"] = new_id
-        POSTS.append(new_post)
-        save_data("POSTS.json", POSTS)
+        posts = get_posts_data()
+        posts.append(new_post)
+        save_data("POSTS.json", posts)
         return jsonify(new_post), 201
 
     sort_field = request.args.get('sort')
@@ -80,7 +82,7 @@ def get_posts():
     valid_sort_fields = ['title', 'content']
     valid_directions = ['asc', 'desc']
 
-    posts = POSTS.copy()
+    posts = get_posts_data()
 
     if sort_field:
         if sort_field not in valid_sort_fields:
@@ -106,9 +108,9 @@ def delete_post(id):
 
     if post is None:
         return jsonify({'error': 'Post not found'}), 404
-
-    POSTS.remove(post)
-    save_data("POSTS.json", POSTS)
+    posts = get_posts_data()
+    posts.remove(post)
+    save_data("POSTS.json", posts)
     return jsonify({"message": f"Post with id {id} has been deleted successfully."}), 200
 
 
@@ -124,12 +126,12 @@ def update_post(id):
         return jsonify({'error': 'Post not found'}), 404
 
     new_data = request.get_json()
-
+    posts = get_posts_data()
     if 'title' in new_data:
         post['title'] = new_data['title']
     if 'content' in new_data:
         post['content'] = new_data['content']
-    save_data("POSTS.json", POSTS)
+    save_data("POSTS.json", posts)
 
     return jsonify(post), 200
 
@@ -145,7 +147,7 @@ def search_posts():
     title = request.args.get('title')
     content = request.args.get('content')
 
-    filtered_posts = POSTS
+    filtered_posts = get_posts_data()
 
     if title:
         filtered_posts = [post for post in filtered_posts if title.lower() in post.get('title', '').lower()]
