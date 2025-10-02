@@ -29,18 +29,26 @@ def save_data(file_path, data):
         print(f"❌Error saving data to {file_path}: {e}")
 
 
-
 POSTS = load_data("POSTS.json")
 
 
-
 def validate_post_data(data):
+    """Validates that the given post data contains both a title and content.
+        Args:
+            data (dict): The incoming JSON data.
+        Returns:
+            bool: True if valid, False otherwise."""
     if 'title' not in data or 'content' not in data:
         return False
     return True
 
 
 def find_post_by_id(post_id):
+    """Finds a post in the POSTS list by its ID.
+        Args:
+            post_id (int): The ID of the post to find.
+        Returns:
+            dict or None: The post if found, otherwise None."""
     for post in POSTS:
         if post['id'] == post_id:
             return post
@@ -49,6 +57,11 @@ def find_post_by_id(post_id):
 
 @app.route('/api/posts', methods=['GET', 'POST'])
 def get_posts():
+    """GET: Returns a list of posts, optionally sorted by title or content.
+             Accepts 'sort' and 'direction' as query parameters.
+        POST: Adds a new post if 'title' and 'content' are provided in the request body.
+        Returns:
+            JSON response with post data or error message."""
     if request.method == 'POST':
         new_post =  request.get_json()
         if not validate_post_data(new_post):
@@ -84,6 +97,11 @@ def get_posts():
 
 @app.route('/api/posts/<int:id>', methods=['DELETE'])
 def delete_post(id):
+    """Deletes a post with the specified ID.
+        Args:
+            id (int): The ID of the post to delete.
+        Returns:
+            JSON response with success message or error."""
     post = find_post_by_id(id)
 
     if post is None:
@@ -96,6 +114,11 @@ def delete_post(id):
 
 @app.route('/api/posts/<int:id>', methods=['PUT'])
 def update_post(id):
+    """Updates the title and/or content of a post with the given ID.
+        Args:
+            id (int): The ID of the post to update.
+        Returns:
+            JSON response with updated post or error."""
     post = find_post_by_id(id)
     if post is None:
         return jsonify({'error': 'Post not found'}), 404
@@ -113,6 +136,12 @@ def update_post(id):
 
 @app.route('/api/posts/search', methods=['GET'])
 def search_posts():
+    """Searches posts by partial match in title and/or content.
+        Query Parameters:
+            title (str, optional): Title text to search for.
+            content (str, optional): Content text to search for.
+        Returns:
+            JSON list of posts matching the search criteria."""
     title = request.args.get('title')
     content = request.args.get('content')
 
@@ -128,11 +157,17 @@ def search_posts():
 
 @app.errorhandler(404)
 def not_found_error(error):
+    """Handles 404 Not Found errors.
+        Returns:
+            JSON response with error message."""
     return jsonify({"error": "Not Found"}), 404
 
 
 @app.errorhandler(405)
 def method_not_allowed_error(error):
+    """Handles 405 Method Not Allowed errors.
+    Returns:
+        ""JSON response with error message."""
     return jsonify({"error": "Method Not Allowed"}), 405
 
 
