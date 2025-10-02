@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "title": "Welcome to My Blog",
+    "content": "This is the beginning of something great."
+  },
+  {
+    "id": 2,
+    "title": "Python Tips",
+    "content": "Use list comprehensions to write clean code."
+  },
+  {
+    "id": 3,
+    "title": "Flask Routing Explained",
+    "content": "Flask uses decorators to create endpoints."
+  },
+  {
+    "id": 4,
+    "title": "JavaScript Basics",
+    "content": "Let\u2019s talk about variables and scope."
+  },
+  {
+    "id": 5,
+    "title": "Why APIs Matter",
+    "content": "APIs let software talk to other software."
+  },
+  {
+    "id": 6,
+    "title": "Debugging in VS Code",
+    "content": "Breakpoints and watches make your life easier."
+  },
+  {
+    "id": 7,
+    "title": "CSS Flexbox Guide",
+    "content": "Align your items like a pro with flexbox."
+  },
+  {
+    "id": 8,
+    "title": "The Power of Git",
+    "content": "Version control is essential for teams."
+  },
+  {
+    "id": 9,
+    "title": "REST vs. GraphQL",
+    "content": "Two different approaches to API design."
+  },
+  {
+    "id": 10,
+    "title": "Handling Errors in Flask",
+    "content": "Use error handlers to manage 404s and more."
+  }
+]

@@ -1,21 +1,37 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+import json
 
 app = Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
 
-POSTS = [
-    {"id": 1, "title": "Welcome to My Blog", "content": "This is the beginning of something great."},
-    {"id": 2, "title": "Python Tips", "content": "Use list comprehensions to write clean code."},
-    {"id": 3, "title": "Flask Routing Explained", "content": "Flask uses decorators to create endpoints."},
-    {"id": 4, "title": "JavaScript Basics", "content": "Let’s talk about variables and scope."},
-    {"id": 5, "title": "Why APIs Matter", "content": "APIs let software talk to other software."},
-    {"id": 6, "title": "Debugging in VS Code", "content": "Breakpoints and watches make your life easier."},
-    {"id": 7, "title": "CSS Flexbox Guide", "content": "Align your items like a pro with flexbox."},
-    {"id": 8, "title": "The Power of Git", "content": "Version control is essential for teams."},
-    {"id": 9, "title": "REST vs. GraphQL", "content": "Two different approaches to API design."},
-    {"id": 10, "title": "Handling Errors in Flask", "content": "Use error handlers to manage 404s and more."}
-]
+
+
+def load_data(file_path):
+  """ Loads a JSON file """
+  try:
+      with open(file_path, "r") as handle:
+        return json.load(handle)
+  except FileNotFoundError:
+      print(f"⚠️File {file_path} not found. Starting with empty list.")
+      return []
+  except json.JSONDecodeError:
+      print(f"⚠️File {file_path} contains invalid JSON. Starting with empty list.")
+      return []
+
+
+def save_data(file_path, data):
+    """Saves a list of posts to a JSON file."""
+    try:
+        with open(file_path, "w") as handle:
+            json.dump(data, handle, indent=2)
+    except Exception as e:
+        print(f"❌Error saving data to {file_path}: {e}")
+
+
+
+POSTS = load_data("POSTS.json")
+
 
 
 def validate_post_data(data):
@@ -23,11 +39,13 @@ def validate_post_data(data):
         return False
     return True
 
+
 def find_post_by_id(post_id):
     for post in POSTS:
         if post['id'] == post_id:
             return post
     return None
+
 
 @app.route('/api/posts', methods=['GET', 'POST'])
 def get_posts():
@@ -40,6 +58,7 @@ def get_posts():
         new_id = max(post["id"] for post in POSTS) + 1
         new_post["id"] = new_id
         POSTS.append(new_post)
+        save_data("POSTS.json", POSTS)
         return jsonify(new_post), 201
 
     sort_field = request.args.get('sort')
@@ -71,7 +90,7 @@ def delete_post(id):
         return jsonify({'error': 'Post not found'}), 404
 
     POSTS.remove(post)
-
+    save_data("POSTS.json", POSTS)
     return jsonify({"message": f"Post with id {id} has been deleted successfully."}), 200
 
 
@@ -87,6 +106,7 @@ def update_post(id):
         post['title'] = new_data['title']
     if 'content' in new_data:
         post['content'] = new_data['content']
+    save_data("POSTS.json", POSTS)
 
     return jsonify(post), 200
 
@@ -106,15 +126,6 @@ def search_posts():
     return jsonify(filtered_posts), 200
 
 
-
-
-
-
-
-
-
-
-
 @app.errorhandler(404)
 def not_found_error(error):
     return jsonify({"error": "Not Found"}), 404
@@ -123,11 +134,6 @@ def not_found_error(error):
 @app.errorhandler(405)
 def method_not_allowed_error(error):
     return jsonify({"error": "Method Not Allowed"}), 405
-
-
-
-
-
 
 
 if __name__ == '__main__':
